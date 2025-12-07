@@ -1,0 +1,326 @@
+/* ============================================
+   GLOBAL COLORS & FONT
+=============================================== */
+:root{
+  --bg:#061126;
+  --card:#0f172a;
+  --muted:#9ca3af;
+  --text:#e5e7eb;
+  --bull:#22c55e;
+  --bear:#ef4444;
+  --side:#facc15;
+}
+
+*{
+  font-family:'Montserrat', system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============================================
+   BASE DOCUMENT
+=============================================== */
+html,body{
+  margin:0;
+  background:linear-gradient(180deg,#061126 0%, #020617 70%);
+  padding:18px;
+  color:var(--text);
+}
+
+/* ============================================
+   APP CONTAINER
+=============================================== */
+.app{
+  max-width:1100px;
+  margin:auto;
+  padding:22px;
+  border-radius:22px;
+
+  background:rgba(6,17,38,0.45);
+  border:1px solid rgba(148,163,184,0.08);
+  backdrop-filter:blur(12px);
+
+  box-shadow:
+    0 0 35px rgba(56,189,248,0.18),
+    inset 0 0 35px rgba(2,6,23,0.3);
+}
+
+/* ============================================
+   HEADER
+=============================================== */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.title{
+  font-size:30px;
+  font-weight:800;
+  letter-spacing:-0.5px;
+}
+
+.live-indicator{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.live-dot{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  transition:0.3s;
+}
+
+.live-dot.online{
+  background:var(--bull);
+  box-shadow:0 0 12px rgba(34,197,94,0.9);
+}
+
+.live-dot.offline{
+  background:var(--bear);
+  box-shadow:0 0 12px rgba(239,68,68,0.9);
+}
+
+.last-update-label{
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* ============================================
+   GRID
+=============================================== */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 380px;
+  gap:20px;
+}
+
+@media(max-width:900px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+}
+
+/* ============================================
+   CARD BASE
+=============================================== */
+.card{
+  background:linear-gradient(180deg,#071227,#020614);
+  border-radius:18px;
+  padding:22px;
+
+  border:1px solid rgba(148,163,184,0.12);
+  box-shadow:
+      0 0 22px rgba(56,189,248,0.18),
+      inset 0 0 22px rgba(2,6,23,0.6);
+
+  transition:0.25s;
+}
+
+.card:hover{
+  transform:translateY(-2px);
+  box-shadow:
+    0 0 32px rgba(56,189,248,0.35),
+    inset 0 0 22px rgba(2,6,23,0.45);
+}
+
+/* ============================================
+   PRICE PANEL
+=============================================== */
+.main-card{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.price-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+
+.price-large{
+  font-size:38px;
+  font-weight:800;
+  letter-spacing:-0.7px;
+  text-shadow:0 0 10px rgba(56,189,248,0.45);
+}
+
+/* ============================================
+   SELECT & TIMEFRAME
+=============================================== */
+.controls{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:14px;
+}
+
+.select{
+  width:260px;
+  padding:10px;
+  border-radius:12px;
+
+  border:1px solid rgba(56,189,248,0.25);
+  background:rgba(0,14,26,0.6);
+  color:var(--text);
+
+  font-weight:600;
+  font-size:15px;
+
+  box-shadow:
+     0 0 20px rgba(56,189,248,0.18),
+     inset 0 0 12px rgba(2,6,23,0.5);
+
+  transition:0.25s ease;
+}
+
+.select:hover{
+  box-shadow:0 0 28px rgba(56,189,248,0.35);
+}
+
+.tf-row{
+  display:flex;
+  gap:12px;
+  margin-top:10px;     /* extra spacing */
+  margin-bottom:10px;  /* extra spacing */
+}
+
+.tf-btn{
+  padding:8px 16px;
+  border-radius:12px;
+
+  background:rgba(0,13,25,0.6);
+  border:1px solid rgba(56,189,248,0.15);
+
+  font-weight:600;
+  font-size:14px;
+  color:var(--text);
+
+  cursor:pointer;
+  transition:0.25s;
+
+  box-shadow:0 0 15px rgba(56,189,248,0.15);
+}
+
+.tf-btn:hover{
+  box-shadow:0 0 25px rgba(56,189,248,0.35);
+}
+
+.tf-btn.active{
+  background:rgba(56,189,248,0.25);
+  border-color:rgba(56,189,248,0.35);
+
+  box-shadow:
+     0 0 28px rgba(56,189,248,0.45),
+     inset 0 0 12px rgba(2,6,23,0.5);
+}
+
+/* ============================================
+   INDICATORS
+=============================================== */
+.indicators{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.ind-box{
+  padding:18px 22px;
+  border-radius:18px;
+
+  background:rgba(0,12,22,0.55);
+  border:1px solid rgba(255,255,255,0.05);
+
+  transition:0.25s;
+
+  box-shadow:
+      0 0 18px rgba(56,189,248,0.22),
+      inset 0 0 18px rgba(2,6,23,0.6);
+}
+
+.ind-main{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.ind-title{
+  font-size:12px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.ind-value{
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:-0.3px;
+}
+
+/* Glow by trend */
+.ind-box.uptrend{
+  border-color:rgba(34,197,94,0.6);
+  box-shadow:
+     0 0 22px rgba(34,197,94,0.45),
+     inset 0 0 22px rgba(34,197,94,0.25);
+}
+
+.ind-box.downtrend{
+  border-color:rgba(239,68,68,0.6);
+  box-shadow:
+     0 0 22px rgba(239,68,68,0.45),
+     inset 0 0 22px rgba(239,68,68,0.25);
+}
+
+.ind-box.sideways{
+  border-color:rgba(250,204,21,0.6);
+  box-shadow:
+     0 0 22px rgba(250,204,21,0.35),
+     inset 0 0 22px rgba(250,204,21,0.2);
+}
+
+.status-up{color:var(--bull)}
+.status-down{color:var(--bear)}
+.status-side{color:var(--side)}
+
+/* ============================================
+   LOG PANEL
+=============================================== */
+.log-pane{
+  padding-top:18px;
+}
+
+.log-header{
+  margin-bottom:14px;
+}
+
+.log-entry{
+  background:rgba(0,14,25,0.55);
+  padding:10px;
+  border-radius:12px;
+
+  border:1px solid rgba(56,189,248,0.15);
+  box-shadow:0 0 18px rgba(56,189,248,0.15);
+
+  margin-bottom:10px;
+}
+
+/* ============================================
+   TOAST
+=============================================== */
+.toast{
+  position:fixed;
+  right:20px;
+  top:20px;
+  padding:12px 18px;
+
+  background:rgba(0,0,0,0.75);
+  border-radius:14px;
+  border:1px solid rgba(148,163,184,0.18);
+  color:white;
+
+  box-shadow:0 0 22px rgba(56,189,248,0.5);
+}

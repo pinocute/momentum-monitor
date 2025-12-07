@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Momentum Monitor V4</title>
+
+<!-- Premium Font (Binance-like) -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="app">
+
+  <!-- ========================= HEADER ========================= -->
+  <header class="header">
+
+    <div class="title">Momentum Monitor</div>
+
+    <div class="right-controls">
+      <div class="live-indicator">
+        <span id="live-dot" class="live-dot offline"></span>
+        <span id="live-text" class="small-muted status-label">Offline</span>
+        <span class="last-update-label">Updated:
+          <span id="last-update">–</span>
+        </span>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- ========================= MAIN GRID ========================= -->
+  <main class="grid">
+
+    <!-- ========================= LEFT PANEL ========================= -->
+    <section class="card main-card">
+
+      <!-- PRICE ROW -->
+      <div class="price-row">
+        <div>
+          <div id="price" class="price-large">–</div>
+        </div>
+
+        <!-- CONTROLS: COIN SELECT + TIMEFRAME -->
+        <div class="controls">
+
+          <!-- PAIR SELECT -->
+          <select id="symbol-select" class="select">
+            <option>Loading...</option>
+          </select>
+
+          <!-- TIMEFRAME BUTTONS -->
+          <div id="tf-row" class="tf-row">
+            <button class="tf-btn active" data-interval="1m">1m</button>
+            <button class="tf-btn" data-interval="5m">5m</button>
+            <button class="tf-btn" data-interval="15m">15m</button>
+            <button class="tf-btn" data-interval="1h">1h</button>
+            <button class="tf-btn" data-interval="1d">1d</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ========================= INDICATORS ========================= -->
+      <div class="indicators">
+
+        <!-- SUPERTrend -->
+        <div class="ind-box" id="supertrend-box">
+          <div class="ind-title">SUPERtrend</div>
+          <div class="ind-main">
+            <div id="supertrend-status">–</div>
+            <div id="supertrend-value" class="ind-value">–</div>
+          </div>
+        </div>
+
+        <!-- MA90 -->
+        <div class="ind-box" id="ma90-box">
+          <div class="ind-title">MA 90</div>
+          <div class="ind-main">
+            <div id="ma90-status">Sideways</div>
+            <div id="ma90-value" class="ind-value">–</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================= RIGHT PANEL ========================= -->
+    <aside class="card log-pane">
+      <div class="log-header">
+        <div class="log-title">Trend Events</div>
+        <div id="log-meta-text" class="small-muted">Waiting...</div>
+      </div>
+
+      <div id="log-body" class="log-body"></div>
+
+      <div class="footer-note small-muted">Indicator only — not trading advice</div>
+    </aside>
+
+  </main>
+
+</div>
+
+<!-- ========================= TOAST ========================= -->
+<div id="toast" class="toast" style="display:none">
+  <div id="toast-msg">Event</div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
