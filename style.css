@@ -1,113 +1,276 @@
-/* ================
-   MOBILE OPTIMIZATION
-   ================ */
+/* =====================================
+   MOMENTUM MONITOR — STYLE.CSS FINAL
+   Full version including desktop + mobile
+   ===================================== */
 
+/* Reset + Global */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: radial-gradient(ellipse at top, #0c1b33 0%, #06111f 80%);
+  color: #e8edf5;
+  font-family: 'Montserrat', sans-serif;
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Utility texts */
+.small-muted {
+  opacity: 0.6;
+  font-size: 14px;
+}
+
+/* HEADER */
+.header {
+  width: 100%;
+  padding: 20px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #555;
+}
+
+.live-dot.online {
+  background: #2ecc71;
+  box-shadow: 0 0 10px #2ecc71cc;
+}
+
+.live-dot.offline {
+  background: #e74c3c;
+  box-shadow: 0 0 10px #e74c3ccc;
+}
+
+/* GRID LAYOUT */
+.grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  padding: 0 28px 28px 28px;
+}
+
+/* CARD BASE */
+.card {
+  background: rgba(255,255,255,0.04);
+  border-radius: 18px;
+  padding: 24px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+
+/* MAIN PANEL */
+.price-large {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+/* Dropdown */
+.select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #0d1a28;
+  color: #fff;
+  border: 1px solid #223849;
+  font-size: 15px;
+  width: 200px;
+}
+
+/* Timeframe Buttons */
+.tf-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+}
+
+.tf-btn {
+  padding: 10px 18px;
+  font-size: 15px;
+  background: #162436;
+  border: 1px solid #2f4357;
+  color: #d1dae6;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.tf-btn.active,
+.tf-btn:hover {
+  background: #1a2f4a;
+  border-color: #4db3ff;
+  color: #4db3ff;
+}
+
+/* INDICATOR BOXES */
+.ind-box {
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  position: relative;
+  transition: box-shadow 0.3s ease;
+}
+
+/* Glow Effects */
+.ind-box.uptrend {
+  box-shadow: 0 0 14px #27ae60aa;
+}
+
+.ind-box.downtrend {
+  box-shadow: 0 0 14px #e74c3caa;
+}
+
+.ind-box.sideways {
+  box-shadow: 0 0 14px #f1c40faa;
+}
+
+/* Titles */
+.ind-title {
+  font-size: 15px;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.ind-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ind-status {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.ind-value {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* LOG PANEL */
+.log-pane {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.log-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.log-body {
+  margin-top: 16px;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.log-entry {
+  padding: 6px 0;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.footer-note {
+  margin-top: 12px;
+  opacity: 0.5;
+  font-size: 12px;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,30,30,0.8);
+  padding: 16px 26px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 15px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+/* MOBILE OPTIMIZATION */
 @media (max-width: 900px) {
 
-    .main-container {
-        flex-direction: column;
-        padding: 10px;
-        gap: 12px;
-    }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 10px;
+  }
 
-    /* Judul */
-    h1 {
-        font-size: 26px;
-        margin-bottom: 4px;
-        text-align: center;
-    }
+  .header {
+    flex-direction: column;
+    text-align: center;
+    gap: 6px;
+    padding: 16px;
+  }
 
-    .header-top {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 4px;
-    }
+  .title {
+    font-size: 24px;
+  }
 
-    /* Harga */
-    #price {
-        font-size: 32px;
-        text-align: center;
-        margin-top: 6px;
-        margin-bottom: 8px;
-    }
+  #price {
+    font-size: 34px;
+    text-align: center;
+    margin: 10px 0 14px 0;
+  }
 
-    /* Dropdown pair */
-    .pair-row {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        margin-bottom: 14px;
-    }
+  .select {
+    width: 95%;
+    font-size: 16px;
+  }
 
-    #symbol-select {
-        width: 92%;
-        padding: 12px;
-        font-size: 16px;
-        border-radius: 10px;
-    }
+  .tf-container {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 
-    /* Timeframe buttons */
-    .tf-container {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin: 5px 0 18px 0;
-    }
+  .tf-btn {
+    padding: 12px 20px;
+    font-size: 16px;
+  }
 
-    .tf-btn {
-        padding: 10px 18px;
-        border-radius: 10px;
-        font-size: 16px;
-    }
+  .ind-box {
+    width: 100%;
+    padding: 18px;
+    border-radius: 16px;
+  }
 
-    /* BOX Supertrend & MA90 */
-    .indicator-box {
-        width: 100%;
-        padding: 18px;
-        border-radius: 16px;
-        margin-bottom: 14px;
-        box-sizing: border-box;
-        height: auto !important;
-    }
+  .ind-status,
+  .ind-value {
+    font-size: 20px;
+  }
 
-    .indicator-title {
-        font-size: 14px;
-        margin-bottom: 6px;
-    }
-
-    .indicator-value {
-        font-size: 18px;
-    }
-
-    /* Status text */
-    .status-label {
-        font-size: 18px;
-        margin-bottom: 4px;
-    }
-
-    /* Log area */
-    .log-panel {
-        width: 100%;
-        min-height: 160px;
-        padding: 16px;
-        border-radius: 16px;
-        margin-bottom: 20px;
-    }
-
-    .log-entry {
-        font-size: 14px;
-        padding: 6px 0;
-    }
-
-    /* Toast Notification */
-    #toast {
-        bottom: 25px;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 14px 24px;
-        font-size: 14px;
-        border-radius: 10px;
-    }
+  .log-pane {
+    min-height: 200px;
+    padding: 18px;
+  }
 }
