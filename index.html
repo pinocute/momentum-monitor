@@ -1,86 +1,85 @@
 <!doctype html>
 <html lang="en">
-
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Momentum Monitor V4</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<title>Momentum Monitor Mobile-ready</title>
 
-<!-- Premium Font (Binance-like) -->
+<!-- Font: Binance-like (Montserrat) -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+<!-- main stylesheet (replace with your style.css) -->
 <link rel="stylesheet" href="style.css">
+
 </head>
-
 <body>
-<div class="app">
+<div class="app" role="application" aria-label="Momentum Monitor">
 
-  <!-- ========================= HEADER ========================= -->
-  <header class="header">
+  <!-- HEADER -->
+  <header class="header" role="banner">
+    <div class="title" aria-hidden="true">Momentum Monitor</div>
 
-    <div class="title">Momentum Monitor</div>
-
-    <div class="right-controls">
-      <div class="live-indicator">
-        <span id="live-dot" class="live-dot offline"></span>
+    <div class="right-controls" aria-hidden="false">
+      <div class="live-indicator" role="status" aria-live="polite">
+        <span id="live-dot" class="live-dot offline" aria-hidden="true"></span>
         <span id="live-text" class="small-muted status-label">Offline</span>
-        <span class="last-update-label">Updated:
-          <span id="last-update">–</span>
-        </span>
+        <span class="last-update-label small-muted">Updated: <span id="last-update">–</span></span>
       </div>
     </div>
-
   </header>
 
-  <!-- ========================= MAIN GRID ========================= -->
-  <main class="grid">
+  <!-- MAIN GRID -->
+  <main class="grid" role="main">
 
-    <!-- ========================= LEFT PANEL ========================= -->
-    <section class="card main-card">
+    <!-- LEFT PANEL -->
+    <section class="card main-card" aria-labelledby="monitor-heading">
+      <h2 id="monitor-heading" class="sr-only">Momentum Monitor Controls</h2>
 
       <!-- PRICE ROW -->
       <div class="price-row">
         <div>
-          <div id="price" class="price-large">–</div>
+          <div id="price" class="price-large" aria-live="polite">–</div>
         </div>
 
-        <!-- CONTROLS: COIN SELECT + TIMEFRAME -->
+        <!-- CONTROLS -->
         <div class="controls">
 
-          <!-- PAIR SELECT -->
-          <select id="symbol-select" class="select">
-            <option>Loading...</option>
-          </select>
+          <!-- PAIR SELECT (mobile-friendly wrapper) -->
+          <div class="pair-row" style="width:100%;display:flex;justify-content:flex-end;">
+            <select id="symbol-select" class="select" aria-label="Select trading pair">
+              <option>Loading...</option>
+            </select>
+          </div>
 
-          <!-- TIMEFRAME BUTTONS -->
-          <div id="tf-row" class="tf-row">
-            <button class="tf-btn active" data-interval="1m">1m</button>
-            <button class="tf-btn" data-interval="5m">5m</button>
-            <button class="tf-btn" data-interval="15m">15m</button>
-            <button class="tf-btn" data-interval="1h">1h</button>
-            <button class="tf-btn" data-interval="1d">1d</button>
+          <!-- TIMEFRAME BUTTONS (mobile container) -->
+          <div id="tf-row" class="tf-container" role="tablist" aria-label="Timeframes">
+            <button class="tf-btn active" data-interval="1m" role="tab" aria-selected="true">1m</button>
+            <button class="tf-btn" data-interval="5m" role="tab" aria-selected="false">5m</button>
+            <button class="tf-btn" data-interval="15m" role="tab" aria-selected="false">15m</button>
+            <button class="tf-btn" data-interval="1h" role="tab" aria-selected="false">1h</button>
+            <button class="tf-btn" data-interval="1d" role="tab" aria-selected="false">1d</button>
           </div>
 
         </div>
       </div>
 
-      <!-- ========================= INDICATORS ========================= -->
+      <!-- INDICATORS -->
       <div class="indicators">
 
-        <!-- SUPERTrend -->
-        <div class="ind-box" id="supertrend-box">
+        <!-- SUPERtrend -->
+        <div class="ind-box" id="supertrend-box" role="region" aria-label="Supertrend indicator">
           <div class="ind-title">SUPERtrend</div>
           <div class="ind-main">
-            <div id="supertrend-status">–</div>
+            <div id="supertrend-status" class="ind-status small-muted">–</div>
             <div id="supertrend-value" class="ind-value">–</div>
           </div>
         </div>
 
         <!-- MA90 -->
-        <div class="ind-box" id="ma90-box">
+        <div class="ind-box" id="ma90-box" role="region" aria-label="MA 90 indicator">
           <div class="ind-title">MA 90</div>
           <div class="ind-main">
-            <div id="ma90-status">Sideways</div>
+            <div id="ma90-status" class="ind-status small-muted">Sideways</div>
             <div id="ma90-value" class="ind-value">–</div>
           </div>
         </div>
@@ -88,27 +87,28 @@
       </div>
     </section>
 
-    <!-- ========================= RIGHT PANEL ========================= -->
-    <aside class="card log-pane">
+    <!-- RIGHT PANEL: LOG -->
+    <aside class="card log-pane" role="complementary" aria-label="Trend events">
       <div class="log-header">
         <div class="log-title">Trend Events</div>
         <div id="log-meta-text" class="small-muted">Waiting...</div>
       </div>
 
-      <div id="log-body" class="log-body"></div>
+      <div id="log-body" class="log-body" role="log" aria-live="polite"></div>
 
       <div class="footer-note small-muted">Indicator only — not trading advice</div>
     </aside>
 
   </main>
-
 </div>
 
-<!-- ========================= TOAST ========================= -->
-<div id="toast" class="toast" style="display:none">
+<!-- TOAST (mobile-friendly, centered bottom) -->
+<div id="toast" class="toast" style="display:none" role="alert" aria-atomic="true">
   <div id="toast-msg">Event</div>
 </div>
 
+<!-- main script (replace with your app.js) -->
 <script src="app.js"></script>
+
 </body>
 </html>
