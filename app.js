@@ -1,6 +1,6 @@
 /* ========================================================
-   MOMENTUM MONITOR V4 — app.js FINAL
-   Supertrend 10/3 + MA90 + Trend Glow + WS Live Stream
+   MOMENTUM MONITOR V4 — app.js (MA26 Version)
+   Supertrend 10/3 + MA26 + Trend Glow + WS Live Stream
 =========================================================== */
 
 let currentSymbol = "BTCUSDT";
@@ -25,7 +25,7 @@ const elSuperBox = document.getElementById("supertrend-box");
 const elSuperStatus = document.getElementById("supertrend-status");
 const elSuperValue = document.getElementById("supertrend-value");
 
-const elMABox = document.getElementById("ma90-box");
+const elMABox = document.getElementById("ma90-box");       // ID tetap
 const elMAStatus = document.getElementById("ma90-status");
 const elMAValue = document.getElementById("ma90-value");
 
@@ -159,10 +159,10 @@ function computeSupertrend(candles, period, mult) {
 }
 
 /* ============================
-   MATH — MA90
+   MATH — MA26
 ============================ */
 
-function computeMA(candles, len = 90) {
+function computeMA(candles, len = 26) {
   if (candles.length < len) return null;
 
   let sum = 0;
@@ -209,14 +209,14 @@ function updateIndicators(stVal, stTrend, maVal, maDir, price, isFinal) {
 
   updateGlow(elSuperBox, stTrend);
 
-  /* MA90 */
+  /* MA26 (ID tetap ma90) */
   elMAValue.textContent = fmt(maVal, 8);
   elMAStatus.textContent =
     maDir === "up" ? "Uptrend" : maDir === "down" ? "Downtrend" : "Sideways";
 
   updateGlow(elMABox, maDir);
 
-  /* Trend Flip (hanya pada candle close) */
+  /* Trend Flip */
   if (isFinal) {
     if (lastTrend && lastTrend !== stTrend && !initializing) {
       const msg = `${currentSymbol} Supertrend flip → ${elSuperStatus.textContent}`;
@@ -254,12 +254,13 @@ function handleKline(k) {
   }
 
   const { supertrend, trend } = computeSupertrend(candles, ATR_PERIOD, MULTIPLIER);
-  const ma90 = computeMA(candles);
-  const maDir = getMADirection(ma90, lastMA);
 
-  if (ma90 !== null) lastMA = ma90;
+  const ma26 = computeMA(candles, 26);
+  const maDir = getMADirection(ma26, lastMA);
 
-  updateIndicators(supertrend, trend, ma90, maDir, c.close, isFinal);
+  if (ma26 !== null) lastMA = ma26;
+
+  updateIndicators(supertrend, trend, ma26, maDir, c.close, isFinal);
 }
 
 /* ============================
@@ -371,5 +372,5 @@ document.getElementById("tf-row").addEventListener("click", async e => {
   await fetchHistory(currentSymbol, currentInterval);
   connectWS();
 
-  setTimeout(() => initializing = false, 2000);
+  setTimeout(() => (initializing = false), 2000);
 })();
