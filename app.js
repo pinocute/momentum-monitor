@@ -1,6 +1,9 @@
 /* ========================================================
-   MOMENTUM MONITOR V4 — app.js (MA26 Akurat Binance)
-   Supertrend 10/3 + MA26 Closed-Only + Precision TickSize
+   MOMENTUM MONITOR V4 — app.js (MA26 Binance Accurate v2)
+   Supertrend 10/3 + MA26 (final candles) + Trend Glow
+   - MA 26 dihitung hanya dari candle yang sudah CLOSE
+   - Arah MA (Up / Down / Sideways) pakai slope asli (tanpa threshold 0.04%)
+   - History 1000 candle untuk akurasi lebih baik
 =========================================================== */
 
 let currentSymbol = "BTCUSDT";
@@ -15,8 +18,6 @@ let lastTrend = null;
 let lastMA = null;
 let initializing = true;
 
-let symbolMeta = {}; // tickSize storage
-
 /* ============================
    DOM ELEMENTS
 ============================ */
@@ -27,7 +28,7 @@ const elSuperBox = document.getElementById("supertrend-box");
 const elSuperStatus = document.getElementById("supertrend-status");
 const elSuperValue = document.getElementById("supertrend-value");
 
-const elMABox = document.getElementById("ma90-box");
+const elMABox = document.getElementById("ma90-box");       // ID HTML tetap
 const elMAStatus = document.getElementById("ma90-status");
 const elMAValue = document.getElementById("ma90-value");
 
@@ -76,22 +77,8 @@ function showToast(msg) {
   setTimeout(() => (toast.style.display = "none"), 2500);
 }
 
-function roundToTick(price, symbol) {
-  if (!symbolMeta[symbol]) return price;
-
-  const filter = symbolMeta[symbol].filters.find(f => f.filterType === "PRICE_FILTER");
-  if (!filter) return price;
-
-  const tick = parseFloat(filter.tickSize);
-  const decimals = tick.toString().includes(".")
-    ? tick.toString().split(".")[1].length
-    : 0;
-
-  return Number(price.toFixed(decimals));
-}
-
 /* ============================
-   SUPERtrend
+   MATH — SUPERtrend
 ============================ */
 
 function trueRange(high, low, prevClose) {
@@ -175,10 +162,12 @@ function computeSupertrend(candles, period, mult) {
 }
 
 /* ============================
-   MA26 Closed Candle Only (Akurat Binance)
+   MATH — MA26 (final candles only)
 ============================ */
 
 function computeMA(candles, len = 26) {
+  // gunakan hanya candle yang sudah close (isFinal = true),
+  // supaya cocok dengan cara Binance / TradingView menghitung MA
   const finals = candles.filter(c => c.isFinal);
   if (finals.length < len) return null;
 
@@ -186,19 +175,15 @@ function computeMA(candles, len = 26) {
   for (let i = finals.length - len; i < finals.length; i++) {
     sum += finals[i].close;
   }
-
   return sum / len;
 }
 
+// arah MA berdasarkan slope murni (tanpa threshold persentase)
 function getMADirection(now, prev) {
   if (!now || !prev) return "sideways";
-
   const diff = now - prev;
-  const pct = (diff / prev) * 100;
-  const threshold = 0.04;
-
-  if (pct > threshold) return "up";
-  if (pct < -threshold) return "down";
+  if (diff > 0) return "up";
+  if (diff < 0) return "down";
   return "sideways";
 }
 
@@ -217,6 +202,7 @@ function updateGlow(box, mode) {
 }
 
 function updateIndicators(stVal, stTrend, maVal, maDir, price, isFinal) {
+  // price & waktu
   elPrice.textContent = fmt(price, 8);
   elLastUpdate.textContent = new Date().toLocaleTimeString();
 
@@ -224,17 +210,23 @@ function updateIndicators(stVal, stTrend, maVal, maDir, price, isFinal) {
   elSuperValue.textContent = fmt(stVal, 8);
   elSuperStatus.textContent =
     stTrend === "bull" ? "Uptrend" : stTrend === "bear" ? "Downtrend" : "–";
+
   updateGlow(elSuperBox, stTrend);
 
-  /* MA26 (akurat Binance) */
-  const roundedMA = maVal != null ? roundToTick(maVal, currentSymbol) : null;
-  elMAValue.textContent = fmt(roundedMA, 8);
-  elMAStatus.textContent =
+  /* MA26 (ID tetap ma90) */
+  if (maVal == null) {
+    elMAValue.textContent = "–";
+  } else {
+    elMAValue.textContent = fmt(maVal, 8);
+  }
+
+  const label =
     maDir === "up" ? "Uptrend" : maDir === "down" ? "Downtrend" : "Sideways";
+  elMAStatus.textContent = label;
 
   updateGlow(elMABox, maDir);
 
-  /* Trend Flip */
+  /* Log flip Supertrend hanya saat candle close */
   if (isFinal) {
     if (lastTrend && lastTrend !== stTrend && !initializing) {
       const msg = `${currentSymbol} Supertrend flip → ${elSuperStatus.textContent}`;
@@ -264,22 +256,26 @@ function handleKline(k) {
 
   const idx = candles.findIndex(x => x.openTime === openTime);
 
-  if (idx >= 0) candles[idx] = c;
-  else {
+  if (idx >= 0) {
+    candles[idx] = c;
+  } else {
     candles.push(c);
     if (candles.length > 2000) candles.shift();
   }
 
   const { supertrend, trend } = computeSupertrend(candles, ATR_PERIOD, MULTIPLIER);
 
+  // default: pakai MA terakhir yang sudah diketahui
   let ma26 = lastMA;
   let maDir = "sideways";
 
+  // hanya hitung MA baru jika candle baru saja CLOSE (supaya sama dengan chart)
   if (isFinal) {
-    ma26 = computeMA(candles, 26);
-    if (ma26 !== null) {
-      maDir = getMADirection(ma26, lastMA);
-      lastMA = ma26;
+    const newMA = computeMA(candles, 26);
+    if (newMA !== null) {
+      maDir = getMADirection(newMA, lastMA);
+      lastMA = newMA;
+      ma26 = newMA;
     }
   }
 
@@ -301,21 +297,11 @@ async function fetchHistory(symbol, interval) {
     high: parseFloat(d[2]),
     low: parseFloat(d[3]),
     close: parseFloat(d[4]),
-    isFinal: true,
+    isFinal: true, // semua data history adalah candle yang sudah close
   }));
-}
 
-/* ============================
-   METADATA (tickSize)
-============================ */
-
-async function loadSymbolMeta() {
-  const res = await fetch("https://api.binance.com/api/v3/exchangeInfo");
-  const data = await res.json();
-
-  data.symbols.forEach(s => {
-    symbolMeta[s.symbol] = s;
-  });
+  // siapkan nilai MA awal dari history final
+  lastMA = computeMA(candles, 26);
 }
 
 /* ============================
@@ -368,6 +354,14 @@ async function loadTop50() {
     opt.textContent = t.symbol;
     elSymbolSelect.appendChild(opt);
   });
+
+  // pastikan dropdown menampilkan currentSymbol bila ada di top50
+  const exists = Array.from(elSymbolSelect.options).some(
+    o => o.value === currentSymbol
+  );
+  if (!exists && elSymbolSelect.options.length > 0) {
+    currentSymbol = elSymbolSelect.options[0].value;
+  }
 }
 
 /* ============================
@@ -380,6 +374,8 @@ elSymbolSelect.addEventListener("change", async e => {
 
   await fetchHistory(currentSymbol, currentInterval);
   connectWS();
+
+  setTimeout(() => (initializing = false), 2000);
 });
 
 document.getElementById("tf-row").addEventListener("click", async e => {
@@ -397,6 +393,8 @@ document.getElementById("tf-row").addEventListener("click", async e => {
 
   await fetchHistory(currentSymbol, currentInterval);
   connectWS();
+
+  setTimeout(() => (initializing = false), 2000);
 });
 
 /* ============================
@@ -404,7 +402,6 @@ document.getElementById("tf-row").addEventListener("click", async e => {
 ============================ */
 
 (async function init() {
-  await loadSymbolMeta();
   await loadTop50();
   await fetchHistory(currentSymbol, currentInterval);
   connectWS();
