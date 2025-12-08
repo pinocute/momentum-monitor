@@ -1,6 +1,6 @@
 /* ========================================================
-   MOMENTUM MONITOR V4 — app.js (MA26 Version)
-   Supertrend 10/3 + MA26 + Trend Glow + WS Live Stream
+   MOMENTUM MONITOR V4 — app.js (MA26 Akurat Binance)
+   Supertrend 10/3 + MA26 Closed-Only + Precision TickSize
 =========================================================== */
 
 let currentSymbol = "BTCUSDT";
@@ -15,6 +15,8 @@ let lastTrend = null;
 let lastMA = null;
 let initializing = true;
 
+let symbolMeta = {}; // tickSize storage
+
 /* ============================
    DOM ELEMENTS
 ============================ */
@@ -25,7 +27,7 @@ const elSuperBox = document.getElementById("supertrend-box");
 const elSuperStatus = document.getElementById("supertrend-status");
 const elSuperValue = document.getElementById("supertrend-value");
 
-const elMABox = document.getElementById("ma90-box");       // ID tetap
+const elMABox = document.getElementById("ma90-box");
 const elMAStatus = document.getElementById("ma90-status");
 const elMAValue = document.getElementById("ma90-value");
 
@@ -74,8 +76,22 @@ function showToast(msg) {
   setTimeout(() => (toast.style.display = "none"), 2500);
 }
 
+function roundToTick(price, symbol) {
+  if (!symbolMeta[symbol]) return price;
+
+  const filter = symbolMeta[symbol].filters.find(f => f.filterType === "PRICE_FILTER");
+  if (!filter) return price;
+
+  const tick = parseFloat(filter.tickSize);
+  const decimals = tick.toString().includes(".")
+    ? tick.toString().split(".")[1].length
+    : 0;
+
+  return Number(price.toFixed(decimals));
+}
+
 /* ============================
-   MATH — SUPERtrend
+   SUPERtrend
 ============================ */
 
 function trueRange(high, low, prevClose) {
@@ -159,16 +175,18 @@ function computeSupertrend(candles, period, mult) {
 }
 
 /* ============================
-   MATH — MA26
+   MA26 Closed Candle Only (Akurat Binance)
 ============================ */
 
 function computeMA(candles, len = 26) {
-  if (candles.length < len) return null;
+  const finals = candles.filter(c => c.isFinal);
+  if (finals.length < len) return null;
 
   let sum = 0;
-  for (let i = candles.length - len; i < candles.length; i++) {
-    sum += candles[i].close;
+  for (let i = finals.length - len; i < finals.length; i++) {
+    sum += finals[i].close;
   }
+
   return sum / len;
 }
 
@@ -206,11 +224,11 @@ function updateIndicators(stVal, stTrend, maVal, maDir, price, isFinal) {
   elSuperValue.textContent = fmt(stVal, 8);
   elSuperStatus.textContent =
     stTrend === "bull" ? "Uptrend" : stTrend === "bear" ? "Downtrend" : "–";
-
   updateGlow(elSuperBox, stTrend);
 
-  /* MA26 (ID tetap ma90) */
-  elMAValue.textContent = fmt(maVal, 8);
+  /* MA26 (akurat Binance) */
+  const roundedMA = maVal != null ? roundToTick(maVal, currentSymbol) : null;
+  elMAValue.textContent = fmt(roundedMA, 8);
   elMAStatus.textContent =
     maDir === "up" ? "Uptrend" : maDir === "down" ? "Downtrend" : "Sideways";
 
@@ -246,19 +264,24 @@ function handleKline(k) {
 
   const idx = candles.findIndex(x => x.openTime === openTime);
 
-  if (idx >= 0) {
-    candles[idx] = c;
-  } else {
+  if (idx >= 0) candles[idx] = c;
+  else {
     candles.push(c);
     if (candles.length > 2000) candles.shift();
   }
 
   const { supertrend, trend } = computeSupertrend(candles, ATR_PERIOD, MULTIPLIER);
 
-  const ma26 = computeMA(candles, 26);
-  const maDir = getMADirection(ma26, lastMA);
+  let ma26 = lastMA;
+  let maDir = "sideways";
 
-  if (ma26 !== null) lastMA = ma26;
+  if (isFinal) {
+    ma26 = computeMA(candles, 26);
+    if (ma26 !== null) {
+      maDir = getMADirection(ma26, lastMA);
+      lastMA = ma26;
+    }
+  }
 
   updateIndicators(supertrend, trend, ma26, maDir, c.close, isFinal);
 }
@@ -268,7 +291,7 @@ function handleKline(k) {
 ============================ */
 
 async function fetchHistory(symbol, interval) {
-  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=500`;
+  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=1000`;
   const res = await fetch(url);
   const data = await res.json();
 
@@ -280,6 +303,19 @@ async function fetchHistory(symbol, interval) {
     close: parseFloat(d[4]),
     isFinal: true,
   }));
+}
+
+/* ============================
+   METADATA (tickSize)
+============================ */
+
+async function loadSymbolMeta() {
+  const res = await fetch("https://api.binance.com/api/v3/exchangeInfo");
+  const data = await res.json();
+
+  data.symbols.forEach(s => {
+    symbolMeta[s.symbol] = s;
+  });
 }
 
 /* ============================
@@ -368,6 +404,7 @@ document.getElementById("tf-row").addEventListener("click", async e => {
 ============================ */
 
 (async function init() {
+  await loadSymbolMeta();
   await loadTop50();
   await fetchHistory(currentSymbol, currentInterval);
   connectWS();
